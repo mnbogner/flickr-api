@@ -122,6 +122,15 @@ public class PhotosetsService extends FlickrService {
         args.addParam("primary_photo_id", primaryPhoto.getId());
         return doPost(args, PhotosetResponse.class).getPhotoset();
     }
+    
+    // there is no reason to require a Photo object if only the id is used
+    public Photoset createPhotoset(String title, String description, String primaryPhotoId) throws FlickrException {
+        CommandArguments args = new CommandArguments("flickr.photosets.create");
+        args.addParam("title", title);
+        args.addParam("description", description);
+        args.addParam("primary_photo_id", primaryPhotoId);
+        return doPost(args, PhotosetResponse.class).getPhotoset();
+    }
 
     /**
      * Delete a photoset
@@ -176,6 +185,14 @@ public class PhotosetsService extends FlickrService {
         CommandArguments args = new CommandArguments("flickr.photosets.addPhoto");
         args.addParam("photoset_id", photoset.getId());
         args.addParam("photo_id", photo.getId());
+        doPost(args, VoidResponse.class);
+    }
+    
+    // there is no reason to require a Photo object if only the id is used
+    public void addPhotoToSet(Photoset photoset, String photoId) throws FlickrException {
+        CommandArguments args = new CommandArguments("flickr.photosets.addPhoto");
+        args.addParam("photoset_id", photoset.getId());
+        args.addParam("photo_id", photoId);
         doPost(args, VoidResponse.class);
     }
 

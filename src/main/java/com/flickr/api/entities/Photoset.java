@@ -31,30 +31,39 @@ public class Photoset implements IdObject {
     private static final long serialVersionUID = 545748673399L;
 
     private final String id;
-    private final int photos;
-    private final String owner;
-    private final String title;
-    private final String description;
-    private final int countViews;
-    private final Image primaryPhoto;
-    private final boolean canComment;
-    private final int commentCount;
-    private final Date creationDate;
-    private final Date updateDate;
+    
+    // see comment below.  there may be no values with which to initialize these fields so they cannot be final
+    private int photos;
+    private String owner;
+    private String title;
+    private String description;
+    private int countViews;
+    private Image primaryPhoto;
+    private boolean canComment;
+    private int commentCount;
+    private Date creationDate;
+    private Date updateDate;
 
     Photoset(JSONObject json)
             throws JSONException {
         id = json.getString("id");
-        photos = json.getInt("photos");
-        owner = json.optString("owner");
-        title = JSONUtils.getContent(json, "title");
-        description = JSONUtils.getContent(json, "description");
-        countViews = json.getInt("count_views");
-        primaryPhoto = new Image(json.getString("farm"), json.getString("server"), json.getString("primary"), json.getString("secret"));
-        canComment = json.getInt("can_comment") == 1;
-        commentCount = json.getInt("count_comments");
-        creationDate = JSONUtils.dateFromString(json.getString("date_create"));
-        updateDate = JSONUtils.dateFromString(json.getString("date_update"));
+        
+        // the flickr api response for successfully creating a photo set may include only "id" and "url"
+        try {
+            photos = json.getInt("photos");
+            owner = json.optString("owner");
+            title = JSONUtils.getContent(json, "title");
+            description = JSONUtils.getContent(json, "description");
+            countViews = json.getInt("count_views");
+            primaryPhoto = new Image(json.getString("farm"), json.getString("server"), json.getString("primary"), json.getString("secret"));
+            canComment = json.getInt("can_comment") == 1;
+            commentCount = json.getInt("count_comments");
+            creationDate = JSONUtils.dateFromString(json.getString("date_create"));
+            updateDate = JSONUtils.dateFromString(json.getString("date_update"));
+        } catch (JSONException je) {
+            // this is not a critical error, catch it here instead of propagating it
+            System.out.println("(Photoset) unable to parse optional json field from response: " + je.getMessage());
+        }
     }
 
     @Override
